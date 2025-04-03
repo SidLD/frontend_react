@@ -57,7 +57,7 @@ Good luck with your frontend exam! 🚀
 
 
 Here included the data in the system
-const jsonData = {
+{
   discounts: [
     {
       code: "SUMMER2025",
@@ -67,6 +67,7 @@ const jsonData = {
       startDate: "2025-06-01T00:00:00Z",
       endDate: "2025-06-30T23:59:59Z",
       minimumPurchase: 50,
+      
     },
     {
       code: "FREESHIP",
@@ -76,6 +77,7 @@ const jsonData = {
       startDate: "2025-03-01T00:00:00Z",
       endDate: "2025-12-31T23:59:59Z",
       minimumPurchase: 100,
+      
     },
     {
       code: "CLEARANCE30",
@@ -85,6 +87,7 @@ const jsonData = {
       startDate: "2025-04-01T00:00:00Z",
       endDate: "2025-04-30T23:59:59Z",
       minimumPurchase: 20,
+      
     },
     {
       code: "SAVE10NOW",
@@ -94,7 +97,9 @@ const jsonData = {
       startDate: "2025-01-01T00:00:00Z",
       endDate: "2025-12-31T23:59:59Z",
       minimumPurchase: 0,
+      
     },
+    
   ],
   coupons: [
     {
@@ -102,28 +107,39 @@ const jsonData = {
       amount: 20,
       type: "PERCENT",
       available: true,
-      conditions: ["FREE_SHIPPING"],
+      conditions: [
+        "FREE_SHIPPING"
+      ],
       startDate: "2025-05-01T00:00:00Z",
       endDate: "2025-05-31T23:59:59Z",
+      
     },
     {
       code: "HOLIDAYSALE",
       amount: 50,
       type: "FLAT",
       available: false,
-      conditions: ["LAST_STOCK", "DISCOUNT"],
+      conditions: [
+        "LAST_STOCK",
+        "DISCOUNT"
+      ],
       startDate: "2025-11-01T00:00:00Z",
       endDate: "2025-11-30T23:59:59Z",
+      
     },
     {
       code: "WELCOME50",
       amount: 50,
       type: "FLAT",
       available: true,
-      conditions: ["NEW_USER"],
+      conditions: [
+        "NEW_USER"
+      ],
       startDate: "2025-01-01T00:00:00Z",
       endDate: "2025-06-30T23:59:59Z",
+      
     },
+    
   ],
   products: [
     {
@@ -132,11 +148,16 @@ const jsonData = {
       description: "Classic cotton t-shirt with a comfortable fit and stylish design.",
       size: "LARGE",
       amount: 55,
-      tags: ["FREE_SHIPPING", "DISCOUNT", "LAST_STOCK"],
+      tags: [
+        "FREE_SHIPPING",
+        "DISCOUNT",
+        "LAST_STOCK"
+      ],
       stock: 100,
       image: "https://picsum.photos/id/237/200/300",
       discountCode: "SUMMER2025",
       category: "Dusk Eyelit",
+      
     },
     {
       id: "p2",
@@ -144,11 +165,16 @@ const jsonData = {
       description: "Lightweight athletic sneakers perfect for running or casual wear.",
       size: "MEDIUM",
       amount: 55,
-      tags: ["DISCOUNT", "LAST_STOCK", "FREE_SHIPPING"],
+      tags: [
+        "DISCOUNT",
+        "LAST_STOCK",
+        "FREE_SHIPPING"
+      ],
       stock: 50,
       image: "https://picsum.photos/id/21/200/300",
       discountCode: "SUMMER2025",
       category: "Dusk Eyelit",
+      
     },
     {
       id: "p3",
@@ -156,11 +182,16 @@ const jsonData = {
       description: "Feature-rich smartwatch with health tracking and notifications.",
       size: "SMALL",
       amount: 55,
-      tags: ["LAST_STOCK", "DISCOUNT", "FREE_SHIPPING"],
+      tags: [
+        "LAST_STOCK",
+        "DISCOUNT",
+        "FREE_SHIPPING"
+      ],
       stock: 30,
       image: "https://picsum.photos/id/48/200/300",
       discountCode: "CLEARANCE30",
       category: "Dusk Eyelit",
+      
     },
     {
       id: "p4",
@@ -168,11 +199,16 @@ const jsonData = {
       description: "Durable backpack with multiple compartments and water-resistant material.",
       size: "MEDIUM",
       amount: 55,
-      tags: ["FREE_SHIPPING", "DISCOUNT", "LAST_STOCK"],
+      tags: [
+        "FREE_SHIPPING",
+        "DISCOUNT",
+        "LAST_STOCK"
+      ],
       stock: 60,
       image: "https://picsum.photos/id/119/200/300",
       discountCode: null,
       category: "Dusk Eyelit",
+      
     },
     {
       id: "p5",
@@ -180,11 +216,16 @@ const jsonData = {
       description: "Noise-cancelling headphones with premium sound quality and comfort.",
       size: "LARGE",
       amount: 55,
-      tags: ["DISCOUNT", "LAST_STOCK", "FREE_SHIPPING"],
+      tags: [
+        "DISCOUNT",
+        "LAST_STOCK",
+        "FREE_SHIPPING"
+      ],
       stock: 80,
       image: "https://picsum.photos/id/367/200/300",
       discountCode: "FREESHIP",
       category: "Dusk Eyelit",
+      
     },
     {
       id: "p6",
@@ -192,11 +233,16 @@ const jsonData = {
       description: "Stylish swimwear bottoms with side ties and cheeky cut for a flattering fit.",
       size: "SMALL",
       amount: 55,
-      tags: ["FREE_SHIPPING", "LAST_STOCK", "DISCOUNT"],
+      tags: [
+        "FREE_SHIPPING",
+        "LAST_STOCK",
+        "DISCOUNT"
+      ],
       stock: 45,
       image: "https://picsum.photos/id/64/200/300",
       discountCode: "SUMMER2025",
       category: "Dusk Eyelit",
+      
     },
     {
       id: "p7",
@@ -204,11 +250,16 @@ const jsonData = {
       description: "Classic black swimwear bottoms with adjustable side ties and cheeky cut.",
       size: "MEDIUM",
       amount: 55,
-      tags: ["FREE_SHIPPING", "LAST_STOCK", "DISCOUNT"],
+      tags: [
+        "FREE_SHIPPING",
+        "LAST_STOCK",
+        "DISCOUNT"
+      ],
       stock: 38,
       image: "https://picsum.photos/id/65/200/300",
       discountCode: "SUMMER2025",
       category: "Dusk Eyelit",
+      
     },
     {
       id: "p8",
@@ -216,11 +267,16 @@ const jsonData = {
       description: "Neutral beige swimwear bottoms with side ties and comfortable fabric.",
       size: "LARGE",
       amount: 55,
-      tags: ["FREE_SHIPPING", "LAST_STOCK", "DISCOUNT"],
+      tags: [
+        "FREE_SHIPPING",
+        "LAST_STOCK",
+        "DISCOUNT"
+      ],
       stock: 42,
       image: "https://picsum.photos/id/68/200/300",
       discountCode: "SUMMER2025",
       category: "Dusk Eyelit",
+      
     },
     {
       id: "p9",
@@ -228,11 +284,16 @@ const jsonData = {
       description: "Vibrant orange swimwear bottoms with adjustable side ties for a perfect fit.",
       size: "SMALL",
       amount: 55,
-      tags: ["FREE_SHIPPING", "LAST_STOCK", "DISCOUNT"],
+      tags: [
+        "FREE_SHIPPING",
+        "LAST_STOCK",
+        "DISCOUNT"
+      ],
       stock: 35,
       image: "https://picsum.photos/id/91/200/300",
       discountCode: "SUMMER2025",
       category: "Dusk Eyelit",
+      
     },
     {
       id: "p10",
@@ -240,11 +301,16 @@ const jsonData = {
       description: "Earth-toned brown swimwear bottoms with side ties and cheeky design.",
       size: "MEDIUM",
       amount: 55,
-      tags: ["FREE_SHIPPING", "LAST_STOCK"],
+      tags: [
+        "FREE_SHIPPING",
+        "LAST_STOCK"
+      ],
       stock: 40,
       image: "https://picsum.photos/id/106/200/300",
       category: "Dusk Eyelit",
+      
     },
+    
   ],
   shipping: [
     {
@@ -254,18 +320,19 @@ const jsonData = {
       discount: {
         minimumAmount: 500,
         maximumAmount: 1000,
-        startDay: new Date("2025-06-01"),
-        endDay: new Date("2025-06-30"),
+        startDay: newDate("2025-06-01"),
+        endDay: newDate("2025-06-30"),
         type: "PERCENTAGE",
         value: 100
       },
+      
     },
     {
       code: "s2",
       name: "FedEX",
       price: 15
     },
+    
   ],
-};
-
-export default jsonData;
+  
+}
