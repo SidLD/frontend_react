@@ -1,7 +1,7 @@
 import { StoreApi, UseBoundStore, create } from "zustand";
-import { createUserSlice, UserSlice } from "./auth.store";
+import { createCartSlice, CartSlice } from "./user.store";
 
-type StoreState = UserSlice ; 
+type StoreState = CartSlice ; 
 
 type WithSelectors<S> = S extends { getState: () => infer T }
   ? S & { use: { [K in keyof T]: () => T[K] } }
@@ -21,7 +21,7 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(
 };
 
 const useStoreBase = create<StoreState>()((...a) => ({
-  ...createUserSlice(...a),
+  ...createCartSlice(...a),
 }));
 
 export const useStore = createSelectors(useStoreBase);

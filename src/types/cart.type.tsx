@@ -1,27 +1,40 @@
 import { z } from 'zod';
 import { ProductType } from './product.type';
 import { DiscountType } from './discount.type';
+import { CouponType } from './coupon.type';
 
-// Define CartType
+export type CartItem = {
+    product: ProductType,
+    discount?: DiscountType,
+    count: number,
+    total: number
+    discountedTotal: number,
+    isChecked: boolean,
+    addedDateTime: Date
+}
+
 export type CartType = {
-    id?: string;                       // Cart identifier (optional)
-    userId: string;                    // User associated with the cart (required)
-    products: ProductType[];           // Array of products in the cart
-    discountCode?: string;             // Discount code applied to the cart (optional)
-    shippingChoice?: string;           // Shipping choice (e.g., 'DHL', 'FedEX')
-    totalPrice: number;                // Total price of the cart, calculated with or without discount
-    discount?: DiscountType;           // Discount applied to the cart (optional)
-    isPaid?: boolean;                  // Payment status (optional)
+    id?: string;                       
+    userId: string;                   
+    items: CartItem[],       
+    coupon?: CouponType;   
+    shipping: {
+        shippingChoice: string,
+        shippingPercentageDiscount: number
+    },        
+    subTotal: number,   
+    totalPrice: number,           
+    termsAndAgreement?: boolean;
 };
 
-// Cart validation schema using Zod
+
 export const CartTypeSchema = z.object({
     id: z.string().optional(),
     userId: z.string().min(1, "User ID is required"),
-    products: z.array(z.string()),    // Array of ProductTypes
-    discountCode: z.string().optional(), // Discount code applied (optional)
-    shippingChoice: z.string().optional(), // Shipping method (optional)
-    totalPrice: z.number().min(0, "Total price cannot be negative"), // Total price validation
+    products: z.array(z.string()),   
+    discountCode: z.string().optional(), 
+    shippingChoice: z.string().optional(), 
+    totalPrice: z.number().min(0, "Total price cannot be negative"),
     discount: z
         .object({
             code: z.string().min(1, "Discount code is required"),
