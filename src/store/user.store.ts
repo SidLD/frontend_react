@@ -353,9 +353,7 @@ const calculateTotalPrice = (items: CartItem[], shipping: ShippingType | null, c
         .reduce((sum, item) => sum + item.discountedTotal, 0);
 
     if (coupon && coupon.available) {
-        subTotal = coupon.code === "BBSWIMPH2025" 
-            ? subTotal * 0.8  
-            : coupon.type === "PERCENT" 
+        subTotal = coupon.type === "PERCENT" 
                 ? subTotal * (1 - coupon.amount / 100) 
                 : subTotal - coupon.amount;
     }

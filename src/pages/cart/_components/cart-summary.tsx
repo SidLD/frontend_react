@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import paypalLogo from '@/assets/payments/paypal.png';
 
 export default function CartSummary() {
-  const { cart, applyCoupon, removeCoupon, } = useStore()
+  const { cart, applyCoupon, removeCoupon,coupons } = useStore()
   const [discountCode, setDiscountCode] = useState("")
   const [showCouponInput, setShowCouponInput] = useState(false)
   const [couponError, setCouponError] = useState<string | null>(null)
@@ -28,7 +28,7 @@ export default function CartSummary() {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 600))
-      const validCoupons = ["BBSWIMPH2025", "WELCOME10", "FREESHIP"]
+      const validCoupons = coupons.map(coup => coup.code)
       const isValidCoupon = validCoupons.includes(discountCode.toUpperCase())
 
       if (isValidCoupon) {
@@ -51,8 +51,8 @@ export default function CartSummary() {
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
-      <h2 className="font-semibold mb-4">ORDER SUMMARY</h2>
+    <div className="p-6 bg-white rounded-lg shadow-sm">
+      <h2 className="mb-4 font-semibold">ORDER SUMMARY</h2>
 
       <div className="space-y-4">
         <div>
@@ -67,7 +67,7 @@ export default function CartSummary() {
               >
                 <Button
                   variant="outline"
-                  className="w-full border-dashed text-gray-600 hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
+                  className="w-full text-gray-600 border-dashed hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
                   onClick={() => setShowCouponInput(true)}
                 >
                   Add coupon code
@@ -84,7 +84,7 @@ export default function CartSummary() {
                 transition={{ duration: 0.3 }}
                 className="space-y-2"
               >
-                <label className="text-sm mb-1 block">Discount code:</label>
+                <label className="block mb-1 text-sm">Discount code:</label>
                 <div className="flex space-x-2">
                   <div className="relative flex-1">
                     <Input
@@ -102,7 +102,7 @@ export default function CartSummary() {
                     />
                     {discountCode && (
                       <button
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute text-gray-400 transform -translate-y-1/2 right-2 top-1/2 hover:text-gray-600"
                         onClick={() => setDiscountCode("")}
                         aria-label="Clear input"
                       >
@@ -112,14 +112,14 @@ export default function CartSummary() {
                   </div>
                   <Button
                     onClick={handleApplyDiscount}
-                    className="bg-black text-white hover:bg-gray-800"
+                    className="text-white bg-black hover:bg-gray-800"
                     disabled={isApplying || !discountCode.trim()}
                   >
                     {isApplying ? (
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1, ease: "linear" }}
-                        className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                        className="w-4 h-4 border-2 border-white rounded-full border-t-transparent"
                       />
                     ) : (
                       "Apply"
@@ -133,7 +133,7 @@ export default function CartSummary() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="flex items-center text-red-500 text-xs mt-1"
+                      className="flex items-center mt-1 text-xs text-red-500"
                     >
                       <AlertCircle className="w-3 h-3 mr-1" />
                       {couponError}
@@ -145,7 +145,7 @@ export default function CartSummary() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-gray-500 hover:text-gray-700 p-0 h-auto"
+                    className="h-auto p-0 text-xs text-gray-500 hover:text-gray-700"
                     onClick={() => {
                       setShowCouponInput(false)
                       setDiscountCode("")
@@ -168,7 +168,7 @@ export default function CartSummary() {
               >
                 <div className="flex items-center">
                   <motion.div
-                    className="bg-green-50 text-green-700 text-sm py-1 px-3 rounded-full flex items-center"
+                    className="flex items-center px-3 py-1 text-sm text-green-700 rounded-full bg-green-50"
                     initial={{ scale: 0.9 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 500, damping: 15 }}
@@ -183,7 +183,7 @@ export default function CartSummary() {
                       <X className="w-3 h-3" />
                     </button>
                   </motion.div>
-                  <span className="text-xs text-green-600 ml-2">
+                  <span className="ml-2 text-xs text-green-600">
                     {cart.coupon.type === "PERCENT" ? `${cart.coupon.amount}% off` : `$${cart.coupon.amount} off`}
                   </span>
                 </div>
@@ -210,7 +210,7 @@ export default function CartSummary() {
         </div>
 
         <div className="pt-4 border-t">
-          <h3 className="font-semibold mb-2">ESTIMATED TOTAL</h3>
+          <h3 className="mb-2 font-semibold">ESTIMATED TOTAL</h3>
           <motion.div
             className="text-xl font-bold"
             key={total}
@@ -223,10 +223,10 @@ export default function CartSummary() {
         </div>
 
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button className="w-full bg-black text-white hover:bg-gray-800" disabled={!cart.termsAndAgreement}>Checkout Now</Button>
+          <Button className="w-full text-white bg-black hover:bg-gray-800" disabled={!cart.termsAndAgreement}>Checkout Now</Button>
         </motion.div>
 
-        <p className="text-xs text-center text-gray-500 flex items-center">
+        <p className="flex items-center text-xs text-center text-gray-500">
           <span className="flex-1 border-t border-black"></span>
           <span className="mx-2">OR CHECKOUT WITH</span>
           <span className="flex-1 border-t border-black"></span>
