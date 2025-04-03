@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Minus, Plus, Heart, Trash2, ShoppingCart } from "lucide-react"
+import { Minus, Plus, Heart, Trash2, ShoppingCart, AlertCircle } from "lucide-react"
 import { useStore } from "@/store/app.store"
 import { Checkbox } from "@/components/components/ui/checkbox"
 import { motion, AnimatePresence } from "framer-motion"
@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from "framer-motion"
 export default function CartItemList() {
   const { cart, updateProductCount, removeFromCart, updateProductCheck, checkAllItem } = useStore()
   const [selectAll, setSelectAll] = useState(false)
-
+  const [showRemoveModal, setShowRemoveModal] = useState(false)
+  const [itemToRemove, setItemToRemove] = useState<string | null>(null)
   const handleSelectAll = () => {
     setSelectAll(!selectAll)
     checkAllItem(!selectAll)
@@ -17,10 +18,28 @@ export default function CartItemList() {
     updateProductCheck(productId)
   }
 
-  const handleQuantityChange = (productId: string, newCount: number) => {
+  const handleQuantityChange = (productId:string, newCount: number) => {
     if (newCount > 0) {
       updateProductCount(productId, newCount)
     }
+  }
+
+  const openRemoveModal = (productId: string) => {
+    setItemToRemove(productId)
+    setShowRemoveModal(true)
+  }
+
+  const confirmRemove = () => {
+    if (itemToRemove) {
+      removeFromCart(itemToRemove)
+      setShowRemoveModal(false)
+      setItemToRemove(null)
+    }
+  }
+
+  const cancelRemove = () => {
+    setShowRemoveModal(false)
+    setItemToRemove(null)
   }
 
   const containerVariants = {
@@ -51,7 +70,24 @@ export default function CartItemList() {
     },
   }
 
-  // Check if cart is empty
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 25,
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.8,
+      transition: { duration: 0.2 }
+    }
+  }
+
   const isCartEmpty = !cart.items || cart.items.length === 0
 
   return (
@@ -75,12 +111,12 @@ export default function CartItemList() {
               {cart.items.map((item, index) => (
                 <motion.div
                   key={`${item.product.id}-${index}`}
-                  className="py-4 grid grid-cols-[auto,1fr,auto] gap-4"
+                  className="p-4 grid grid-cols-[auto,1fr,auto] gap-4 hover:bg-gray-100 transition-all duration-300 ease-in-out rounded-1xl"
                   variants={itemVariants}
                   exit="exit"
                   layout
                 >
-                  <div className="flex items-start">
+                  <div className="flex items-start " >
                     <Checkbox
                       id={`item-${index}`}
                       className="mt-1 mr-3"
@@ -90,7 +126,8 @@ export default function CartItemList() {
                     <motion.img
                       src={item.product.image || "/placeholder.svg"}
                       alt={item.product.name}
-                      className="w-20 h-24 rounded-md object-cover"
+                      className="w-20 h-24 rounded-md object-cover cursor-pointer"
+                      onClick={() => window.open(item.product.image)}
                       whileHover={{ scale: 1.05 }}
                       transition={{ type: "spring", stiffness: 300 }}
                     />
@@ -98,7 +135,10 @@ export default function CartItemList() {
 
                   <div className="flex flex-col justify-between">
                     <div>
-                      <h3 className="font-medium">{item.product.name}</h3>
+                      <h3 className="font-medium cursor-pointer"
+                         onClick={() => window.open(item.product.image)}
+
+                        >{item.product.name}</h3>
                       <p className="text-sm text-gray-500">{item.product.category.split(" ").slice(-2).join(" ")} - {item.product.size}</p>
 
                       <div className="flex space-x-2 mt-1">
@@ -123,7 +163,7 @@ export default function CartItemList() {
                         </motion.button>
                       ) : (
                         <motion.button
-                          onClick={() => removeFromCart(item.product.id!)}
+                          onClick={() => openRemoveModal(item.product.id!)}
                           className="w-6 h-6 flex items-center justify-center border rounded-full"
                           whileHover={{ scale: 1.1, backgroundColor: "#fee2e2" }}
                           whileTap={{ scale: 0.95 }}
@@ -161,20 +201,21 @@ export default function CartItemList() {
                       <span className="font-semibold">${item.total}</span>
                     )}
 
-                    <div className="flex flex-col items-end space-y-2 mt-2">
+                    <div className="flex justify-center gap-2 pace-y-2 items-center">
                       <motion.button
-                        className="text-xs text-gray-500 flex items-center"
+                        className="text-xs text-gray-500 flex items-center mt-1"
                         whileHover={{ scale: 1.05, color: "#f43f5e" }}
                       >
                         <Heart className="w-3 h-3 mr-1" />
                         SAVE TO WISHLIST
                       </motion.button>
+                      <span>|</span>
                       <motion.button
-                        onClick={() => removeFromCart(item.product.id || "")}
-                        className="text-xs text-gray-500 flex items-center"
+                        onClick={() => openRemoveModal(item.product.id!)}
+                        className="text-xs text-gray-500 flex items-center mt-1"
                         whileHover={{ scale: 1.05, color: "#ef4444" }}
                       >
-                        <Trash2 className="w-3 h-3 mr-1" />
+                        <Trash2 className="w-3 h-3" />
                         REMOVE
                       </motion.button>
                     </div>
@@ -231,6 +272,55 @@ export default function CartItemList() {
           </motion.button>
         </motion.div>
       )}
+
+      <AnimatePresence>
+        {showRemoveModal && (
+          <motion.div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={cancelRemove}
+          >
+            <motion.div 
+              className="bg-white rounded-lg p-6 max-w-sm w-full mx-4"
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center mb-4">
+                <AlertCircle className="w-6 h-6 text-red-500 mr-2" />
+                <h3 className="text-lg font-medium">Remove item?</h3>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to remove this item from your cart?
+              </p>
+              
+              <div className="flex justify-end space-x-3">
+                <motion.button
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700"
+                  onClick={cancelRemove}
+                  whileHover={{ scale: 1.05, backgroundColor: "#f9fafb" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  className="px-4 py-2 bg-red-500 text-white rounded-md"
+                  onClick={confirmRemove}
+                  whileHover={{ scale: 1.05, backgroundColor: "#ef4444" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Remove
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

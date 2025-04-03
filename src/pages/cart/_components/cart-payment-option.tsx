@@ -1,7 +1,12 @@
 import { Checkbox } from "@/components/components/ui/checkbox";
+import { useStore } from "@/store/app.store";
 import { motion } from "framer-motion"
 
 export default function PaymentOptions() {
+  const {setAgreement} =  useStore()
+  const handleTermsAndAgreement = () => {
+    setAgreement()
+  }
   return (
     <motion.div 
       className="space-y-4"
@@ -14,7 +19,7 @@ export default function PaymentOptions() {
         className="flex items-center text-xs text-gray-600 justify-center"
         whileHover={{ scale: 1.01 }}
       >
-        <Checkbox id="terms" className="mr-2" />
+        <Checkbox id="terms" className="mr-2" onClick={handleTermsAndAgreement} />
         <label htmlFor="terms">
           I agree to the{" "}
           <motion.a 

@@ -29,6 +29,7 @@ export interface CartSlice {
     coupons: CouponType[]
     shipping: any[]
   }) => void
+  setAgreement: () => void
 }
 
 export const createCartSlice: StateCreator<CartSlice> = (set) => ({
@@ -337,7 +338,13 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
                   subTotal: calculateSubTotal(updatedItems),
                 },
               };
-        }),    
+        }),   
+        setAgreement: () =>
+            set((state) => {
+                return {
+                  cart: {...state.cart, termsAndAgreement: !state.cart.termsAndAgreement},
+                };
+            }) 
 })
 
 const calculateTotalPrice = (items: CartItem[], shipping: ShippingType | null, coupon?: CouponType): number => {

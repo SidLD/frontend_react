@@ -223,7 +223,7 @@ export default function CartSummary() {
         </div>
 
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button className="w-full bg-black text-white hover:bg-gray-800">Checkout Now</Button>
+          <Button className="w-full bg-black text-white hover:bg-gray-800" disabled={!cart.termsAndAgreement}>Checkout Now</Button>
         </motion.div>
 
         <p className="text-xs text-center text-gray-500 flex items-center">
@@ -236,7 +236,7 @@ export default function CartSummary() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <Button className="w-full bg-[#ffc439] hover:bg-[#f0b82d] text-blue-900 font-semibold h-12">
+          <Button className="w-full bg-[#ffc439] hover:bg-[#f0b82d] text-blue-900 font-semibold h-12" disabled={!cart.termsAndAgreement}>
             <motion.div 
               className="mx-auto font-bold"
               initial={{ opacity: 0 }}
