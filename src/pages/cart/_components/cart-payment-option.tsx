@@ -2,11 +2,44 @@ import { Checkbox } from "@/components/components/ui/checkbox";
 import { useStore } from "@/store/app.store";
 import { motion } from "framer-motion"
 
+import amex from '@/assets/payments/amex.png';
+import jcb from '@/assets/payments/jcb.png';
+import paypal_2 from '@/assets/payments/paypal_2.png';
+import union_bank from '@/assets/payments/union_bank.png';
+import union_pay from '@/assets/payments/union_pay.png';
+import visa from '@/assets/payments/visa.png';
+
 export default function PaymentOptions() {
   const {setAgreement} =  useStore()
   const handleTermsAndAgreement = () => {
     setAgreement()
   }
+  const banks = [
+    {
+      name: 'PayPal',
+      image: paypal_2
+    },
+    {
+      name: 'Visa',
+      image: visa
+    },
+    {
+      name: 'Union Bank',
+      image: union_bank
+    },
+    {
+      name: 'JCB',
+      image: jcb
+    },
+    {
+      name: 'AMEX',
+      image: amex
+    },
+    {
+      name: 'UnionPay',
+      image: union_pay
+    }
+  ];
   return (
     <motion.div 
       className="space-y-4"
@@ -16,7 +49,7 @@ export default function PaymentOptions() {
     >
 
       <motion.div 
-        className="flex items-center text-xs text-gray-600 justify-center"
+        className="flex items-center justify-center text-xs text-gray-600"
         whileHover={{ scale: 1.01 }}
       >
         <Checkbox id="terms" className="mr-2" onClick={handleTermsAndAgreement} />
@@ -45,12 +78,12 @@ export default function PaymentOptions() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
       >
-        <p className="text-sm text-center mb-2">Available Payment Methods:</p>
-        <div className="flex justify-center space-x-2">
-          {["PP", "Visa", "MC", "Amex", "Disc"].map((method, index) => (
+        <p className="mb-2 text-sm text-left ml-15 md:ml-3">Available Payment Methods:</p>
+        <div className="ml-[-8%] flex justify-center gap-2 space-x-1">
+          {banks.map((method, index) => (
             <motion.div 
-              key={method}
-              className="w-10 h-6 bg-gray-200 rounded flex items-center justify-center text-xs"
+              key={index}
+              className="flex items-center justify-center w-10 overflow-hidden text-xs bg-white border-gray-400 rounded h-7 hover:scale-110 border-1"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 + index * 0.1 }}
@@ -60,7 +93,7 @@ export default function PaymentOptions() {
                 boxShadow: "0px 2px 4px rgba(0,0,0,0.1)" 
               }}
             >
-              {method}
+              <img src={method.image} className="object-cover bg-white" alt={method.name}/>
             </motion.div>
           ))}
         </div>
