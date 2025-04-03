@@ -11,6 +11,7 @@ import { ShoppingBag } from "lucide-react"
 import { useStore } from "@/store/app.store"
 import { Button } from "@/components/components/ui/button"
 import { CartData } from "@/types/acount.type"
+import Loading from "@/components/loading"
 
 export default function CartPage() {
   const { addToCart, initializeStore } = useStore()
@@ -32,16 +33,12 @@ export default function CartPage() {
 
   const addRandomProduct = () => {
     if (!data || !data.products || data.products.length === 0) return
-
-    // Get a random product from the available products
     const randomIndex = Math.floor(Math.random() * data.products.length)
     const randomProduct = data.products[randomIndex]
-
-    // Add the random product to the cart
     addToCart(randomProduct, 1, true)
   }
 
-  if (isLoading) return <div className="container mx-auto p-4">Loading cart...</div>
+  if (isLoading) return <Loading />
   if (error) return <div className="container mx-auto p-4">Error loading cart data: {error.message}</div>
 
   return (

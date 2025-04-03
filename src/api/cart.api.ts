@@ -10,7 +10,7 @@ export const getSavedCart = async (): Promise<CartData> => {
     products: jsonData.products as any,
     discounts: jsonData.discounts as any,
     coupons: jsonData.coupons as any,
-    shipping: jsonData.shipping,
+    shipping: jsonData.shipping as any,
     user: {
         id: '1'
     }

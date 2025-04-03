@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { ProductType } from './product.type';
 import { DiscountType } from './discount.type';
 import { CouponType } from './coupon.type';
+import { ShippingType } from './shipping.type';
 
 export type CartItem = {
     product: ProductType,
@@ -18,10 +19,7 @@ export type CartType = {
     userId: string;                   
     items: CartItem[],       
     coupon?: CouponType;   
-    shipping: {
-        shippingChoice: string,
-        shippingPercentageDiscount: number
-    },        
+    shipping: ShippingType | null      
     subTotal: number,   
     totalPrice: number,           
     termsAndAgreement?: boolean;

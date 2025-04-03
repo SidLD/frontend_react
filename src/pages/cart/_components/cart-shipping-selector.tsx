@@ -1,9 +1,15 @@
-import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState } from "react"
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue }from "@/components/components/ui/select"
 import { useStore } from "@/store/app.store"
+import { ShippingType } from "@/types/shipping.type"
 export default function ShippingSelector() {
-  const [shippingMethod, setShippingMethod] = useState("s3") 
-    const {shippingOptions} = useStore()
+  const {shippingOptions,setShipping} = useStore()
+  const handleSelectShipping = (code: string) => {
+      const ifExist  = shippingOptions.find((shipping:any) => shipping.code == code) as ShippingType | null
+      if(ifExist){
+        setShipping(ifExist)
+      }
+  }
   return (
     <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
       <h2 className="font-semibold mb-4">ESTIMATED SHIPPING FEE</h2>
@@ -11,14 +17,14 @@ export default function ShippingSelector() {
       <div className="space-y-4">
         <div>
           <label className="text-sm mb-1 block">Shipping to:</label>
-          <Select defaultValue={shippingMethod} onValueChange={setShippingMethod}>
+          <Select defaultValue={'s3'} onValueChange={(e) => handleSelectShipping(e)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select shipping method" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {
-                shippingOptions?.map((option: { id: Key | null | undefined; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }) => (
-                    <SelectItem key={option.id} value={option.id as any}>
+                shippingOptions?.map((option) => (
+                    <SelectItem key={option.code} value={option.code}>
                       {option.name}
                     </SelectItem>
                   ))

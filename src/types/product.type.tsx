@@ -8,5 +8,6 @@ export type ProductType = {
     amount: number;  
     tags: string[];
     stock: number;   
-    discountCodes: string
+    discountCode: string,
+    category: string
 }

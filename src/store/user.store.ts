@@ -4,6 +4,7 @@ import type { DiscountType } from "src/types/discount.type"
 import type { CouponType } from "src/types/coupon.type"
 import type { CartItem, CartType } from "src/types/cart.type"
 import { toZonedTime } from 'date-fns-tz';
+import { ShippingType } from "@/types/shipping.type"
 const timeZone = 'America/New_York';
 export interface CartSlice {
   cart: CartType
@@ -16,9 +17,12 @@ export interface CartSlice {
   checkAllItem: (check: boolean) => void
   applyDiscount: (code: string) => void
   applyCoupon: (code: string) => void
+  totalDiscount: number,
+  removeCoupon: () => void
   clearCart: () => void
   availableProducts: ProductType[],
-  shippingOptions: any
+  shippingOptions: ShippingType[]
+  setShipping: (code: ShippingType) => void,
   initializeStore: (data: {
     products: ProductType[]
     discounts: DiscountType[]
@@ -31,7 +35,7 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
     cart: {
         userId: "",
         items: [],
-        shipping: { shippingChoice: "", shippingPercentageDiscount: 0 },
+        shipping: null,
         subTotal: 0,
         totalPrice: 0,
         coupon: undefined, 
@@ -40,6 +44,7 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
     coupons: [], 
     availableProducts: [],
     shippingOptions: [],
+    totalDiscount: 0,
 
     initializeStore: (data) =>
         set((state) => {
@@ -54,10 +59,13 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
                 : {
                     ...state.cart,
                   },
+            shippings: null
           }
     }),
+    
     addToCart: (product: ProductType, count: number, isChecked = true) =>
         set((state) => {
+            let totalDiscount = 0;
             let updatedItems: CartItem[] = [];
             const existingItem = state.cart.items.find((item) => item.product.id === product.id);
             const currentDate = new Date();
@@ -66,11 +74,16 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
             if (existingItem) {
                 updatedItems = state.cart.items.map((item) => {
                     const availableDiscount = state.discount.find((d) =>
-                        item.product.discountCodes === d.code
+                        item.product.discountCode === d.code
                     );
     
                     if (item.product.id === product.id) {
                         const total = item.product.amount * (item.count + count);
+                        totalDiscount += (availableDiscount
+                            ? availableDiscount.type === "FLAT"
+                                ? availableDiscount.amount
+                                : total * (availableDiscount.amount / 100)
+                            : 0)
                         return {
                             ...item,
                             count: item.count + count,
@@ -90,8 +103,14 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
                 });
             } else {
                 const availableDiscount = state.discount.find((d) =>
-                    product.discountCodes === d.code
+                    product.discountCode === d.code
                 );
+
+                totalDiscount += (availableDiscount
+                    ? availableDiscount.type === "FLAT"
+                        ? availableDiscount.amount
+                        : product.amount * count * (availableDiscount.amount / 100)
+                : 0)
     
                 updatedItems = [
                     ...state.cart.items,
@@ -120,18 +139,24 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
                     totalPrice: calculateTotalPrice(updatedItems, state.cart.shipping, state.cart.coupon),
                     subTotal: calculateSubTotal(updatedItems),
                 },
+                totalDiscount,
             };
         }),
     
     updateProductCount: (productId: string, count: number) =>
         set((state) => {
+            let totalDiscount = 0;
             let updatedItems: CartItem[] = state.cart.items.map((item) => {
                 const availableDiscount = state.discount.find((d) =>
-                    item.product.discountCodes == d.code
+                    item.product.discountCode == d.code
                 );
-    
                 if (item.product.id === productId) {
                     const total = item.product.amount * count;
+                    totalDiscount += (availableDiscount
+                        ? availableDiscount.type === "FLAT"
+                            ? availableDiscount.amount
+                            : total * (availableDiscount.amount / 100)
+                        : 0)
                     return {
                         ...item,
                         count,
@@ -155,11 +180,18 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
                     totalPrice: calculateTotalPrice(updatedItems, state.cart.shipping, state.cart.coupon),
                     subTotal: calculateSubTotal(updatedItems),
                 },
+                totalDiscount
             };
         }),    
 
     removeFromCart: (productId: string) =>
         set((state) => {
+        const itemToRemove = state.cart.items.find((item) => item.product.id !== productId)
+        const discountToRemove = (itemToRemove?.discount
+            ? itemToRemove.discount.type === "FLAT"
+                ? itemToRemove.discount.amount
+                : itemToRemove.total * (itemToRemove.discount.amount / 100)
+            : 0)
         const updatedItems = state.cart.items.filter((item) => item.product.id !== productId)
         return {
             cart: {
@@ -168,6 +200,7 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
                 totalPrice: calculateTotalPrice(updatedItems, state.cart.shipping, state.cart.coupon),
                 subTotal: calculateSubTotal(updatedItems),
             },
+            totalDiscount: (state.totalDiscount - discountToRemove)
         }
     }),
 
@@ -175,8 +208,8 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
         set((state) => {
         // Find if any product has this discount code
         const isValidDiscount = state.cart.items.some((item) => {
-            const discountCodes = item.product.discountCodes
-            return Array.isArray(discountCodes) && discountCodes.includes(code)
+            const discountCode = item.product.discountCode
+            return Array.isArray(discountCode) && discountCode.includes(code)
         })
 
         // Create a new discount if valid
@@ -189,8 +222,8 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
 
         // Apply discount to cart items
         const updatedItems = state.cart.items.map((item) => {
-            const discountCodes = item.product.discountCodes
-            if (Array.isArray(discountCodes) && discountCodes.includes(code)) {
+            const discountCode = item.product.discountCode
+            if (Array.isArray(discountCode) && discountCode.includes(code)) {
             const discountedPrice = item.product.amount * (1 - newDiscount.amount / 100)
             return {
                 ...item,
@@ -213,7 +246,7 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
 
     applyCoupon: (code: string) =>
         set((state) => {
-        // Find coupon in available coupons
+
         const coupon = state.coupons.find((c) => c.code === code && c.available)
 
         return {
@@ -225,12 +258,42 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
         }
     }),
 
+    removeCoupon: () =>
+        set((state) => {
+        return {
+            cart: {
+                ...state.cart,
+                coupon: undefined,
+                totalPrice: calculateTotalPrice(state.cart.items, state.cart.shipping),
+            },
+        }
+    }),
+
+    setShipping : (code: ShippingType) => 
+        set((state) => {
+
+            const shipping = state.shippingOptions.find((c) => c.code === code.code)
+            if(shipping){
+                return {
+                    cart: {
+                    ...state.cart,
+                    shipping: shipping,
+                    totalPrice: calculateTotalPrice(state.cart.items, shipping, state.cart.coupon),
+                    },
+                }
+            }else{
+                return {
+                    ...state
+                }
+            }
+    }),
+
     clearCart: () =>
         set({
         cart: {
             userId: "",
             items: [],
-            shipping: { shippingChoice: "", shippingPercentageDiscount: 0 },
+            shipping: null,
             subTotal: 0,
             totalPrice: 0,
             coupon: undefined,
@@ -277,22 +340,38 @@ export const createCartSlice: StateCreator<CartSlice> = (set) => ({
         }),    
 })
 
-const calculateTotalPrice = (items: CartItem[], shipping: CartType["shipping"], coupon?: CouponType): number => {
-  let subTotal = items.filter(item => item.isChecked).reduce((sum, item) => sum + item.discountedTotal, 0)
+const calculateTotalPrice = (items: CartItem[], shipping: ShippingType | null, coupon?: CouponType): number => {
+    let subTotal = items
+        .filter(item => item.isChecked)
+        .reduce((sum, item) => sum + item.discountedTotal, 0);
 
-  // Apply shipping discount if eligible, this should be verified in the backend too
-  const shippingDiscount = subTotal >= 500 ? shipping.shippingPercentageDiscount : 0
-  subTotal -= shippingDiscount
+    if (coupon && coupon.available) {
+        subTotal = coupon.code === "BBSWIMPH2025" 
+            ? subTotal * 0.8  
+            : coupon.type === "PERCENT" 
+                ? subTotal * (1 - coupon.amount / 100) 
+                : subTotal - coupon.amount;
+    }
 
-  // Apply coupon discount
-  if (coupon && coupon.available) {
-    subTotal = coupon.type === "PERCENT" ? subTotal * (1 - coupon.amount / 100) : subTotal - coupon.amount
-  }
+    let shippingCost = shipping ? shipping.price : 0; 
 
-  return Math.max(subTotal, 0) 
-}
+    if (shipping && shipping.discount) {
+        const { minimumAmount, maximumAmount, startDay, endDay, type, value } = shipping.discount;
+        const today = new Date();
+
+        if (subTotal >= minimumAmount && subTotal <= maximumAmount && today >= startDay && today <= endDay) {
+            shippingCost = type === "FLAT" ? Math.max(0, shipping.price - value) 
+                          : type === "PERCENTAGE" ? Math.max(0, shipping.price * (1 - value / 100)) 
+                          : shippingCost;
+        }
+    }
+
+    return Math.max(subTotal, 0);
+};
+
+
 
 const calculateSubTotal = (items: CartItem[]): number => {
-  return items.filter((item) => item.isChecked).reduce((sum, item) => sum + item.total, 0)
+  return items.filter((item) => item.isChecked).reduce((sum, item) => sum + item.discountedTotal, 0)
 }
 
